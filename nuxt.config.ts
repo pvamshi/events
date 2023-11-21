@@ -2,4 +2,9 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@pinia/nuxt", "@nuxtjs/eslint-module"],
+  runtimeConfig: {
+    public: {
+      API_URL: process.env.API_URL,
+    },
+  },
 });
