@@ -9,7 +9,9 @@ const { data, pending } = await useFetch<{ id: string; title: string }[]>(
 </script>
 <template>
   <div>
+    <el-button type="primary">Primary</el-button>
     <p v-if="pending">Loading...</p>
+
     <ul>
       <li v-for="event in (data || []).slice(0, 10)" :key="event.id">
         {{ event.title }}
