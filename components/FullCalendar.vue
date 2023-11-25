@@ -10,11 +10,26 @@ import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Plus } from "@element-plus/icons-vue";
 import { useEventStore } from "../store/event";
 
-// let currentEvents = [] as EventApi[];
+const dialogVisible = ref(false);
+export interface FormData {
+  start: Date;
+  end: Date;
+  allDay: boolean;
+  title: string;
+  description: string;
+}
+const formData: FormData = reactive({
+  start: new Date(),
+  end: new Date(),
+  allDay: false,
+  title: "",
+  description: "",
+});
 
+const eventStore = useEventStore();
+const currentEvents = eventStore.events;
 const calendarOptions = {
   plugins: [
     dayGridPlugin,
@@ -27,7 +42,7 @@ const calendarOptions = {
     right: "dayGridMonth,timeGridWeek,timeGridDay",
   },
   initialView: "dayGridMonth",
-  initialEvents: [], // alternatively, use the `events` setting to fetch from a feed
+  events: currentEvents, // alternatively, use the `events` setting to fetch from a feed
   editable: true,
   selectable: true,
   selectMirror: true,
@@ -36,6 +51,7 @@ const calendarOptions = {
   select: handleDateSelect,
   eventClick: handleEventClick,
   eventsSet: handleEvents,
+  // eventAdd: handleEventAdd,
   /* you can update a remote database when these fire:
   eventAdd:
   eventChange:
@@ -43,21 +59,51 @@ const calendarOptions = {
   */
 } as CalendarOptions;
 
+// function handleEventAdd({ event }: EventAddArg): void {
+//   console.log(JSON.stringify(event));
+//   if (event.start !== null && event.end !== null) {
+//     eventStore.addEvent({
+//       id: event.id,
+//       start: event.start,
+//       end: event.end,
+//       allDay: event.allDay,
+//       title: event.title,
+//       description: "",
+//     });
+//   }
+// }
 function handleDateSelect(selectInfo: DateSelectArg) {
-  const title = prompt("Please enter a new title for your event");
+  // const title = prompt("Please enter a new title for your event");
   const calendarApi = selectInfo.view.calendar;
 
   calendarApi.unselect(); // clear date selection
 
-  if (title) {
-    calendarApi.addEvent({
-      id: new Date().getTime().toString(),
-      title,
-      start: selectInfo.startStr,
-      end: selectInfo.endStr,
-      allDay: selectInfo.allDay,
-    });
-  }
+  // if (title) {
+  //   calendarApi.addEvent({
+  //     id: new Date().getTime().toString(),
+  //     title,
+  //     start: selectInfo.startStr,
+  //     end: selectInfo.endStr,
+  //     allDay: selectInfo.allDay,
+  //   });
+  // }
+  // const event = selectInfo;
+
+  formData.start = selectInfo.start;
+  formData.end = selectInfo.end;
+  formData.allDay = selectInfo.allDay;
+  dialogVisible.value = true;
+
+  // if (event.start !== null && event.end !== null) {
+  //   eventStore.addEvent({
+  //     id: new Date().getTime().toString(),
+  //     start: event.start,
+  //     end: event.end,
+  //     allDay: event.allDay,
+  //     title: "demo",
+  //     description: "",
+  //   });
+  // }
 }
 function handleEventClick(clickInfo: EventClickArg) {
   if (
@@ -72,31 +118,18 @@ function handleEvents(events: EventApi[]) {
   // currentEvents = events;
   console.log("handle events", events);
 }
-
-// const user = ref("vamshi");
-// const {
-//   public: { API_URL },
-// } = useRuntimeConfig();
-// const { data, pending } = await useFetch<{ id: string; title: string }[]>(
-//   `${API_URL}/events`,
-// );
-const eventStore = useEventStore();
 </script>
 <template>
   <div>
-    <el-button
-      type="success"
-      :icon="Plus"
-      circle
-      @click="eventStore.increment"
-    />
-
-    {{ eventStore.count }}
+    {{ JSON.stringify(formData, null, 2) }}
     <FullCalendar class="demo-app-calendar" :options="calendarOptions">
       <template #eventContent="arg">
         <b>{{ arg.timeText }}</b>
         <i>{{ arg.event.title }}</i>
       </template>
     </FullCalendar>
+    <el-dialog v-model="dialogVisible" title="Add Event" width="50%">
+      <EventForm v-model="formData" @close="dialogVisible = false" />
+    </el-dialog>
   </div>
 </template>
