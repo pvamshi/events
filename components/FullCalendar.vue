@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {
   CalendarOptions,
-  EventApi,
+  // EventApi,
   DateSelectArg,
   EventClickArg,
 } from "@fullcalendar/core";
@@ -36,37 +36,33 @@ const { events } = storeToRefs(eventStore);
 if (events.value === null) {
   eventStore.fetchEvents(API_URL);
 }
-const calendarOptions = {
-  plugins: [
-    dayGridPlugin,
-    timeGridPlugin,
-    interactionPlugin, // needed for dateClick
-  ],
-  headerToolbar: {
-    left: "prev,next today",
-    center: "title",
-    right: "dayGridMonth,timeGridWeek,timeGridDay",
-  },
-  initialView: "dayGridMonth",
-  events: [], // alternatively, use the `events` setting to fetch from a feed
-  editable: true,
-  selectable: true,
-  selectMirror: true,
-  dayMaxEvents: true,
-  weekends: true,
-  select: handleDateSelect,
-  eventClick: handleEventClick,
-  eventsSet: handleEvents,
-  // eventAdd: handleEventAdd,
-  /* you can update a remote database when these fire:
-  eventAdd:
-  eventChange:
-  eventRemove:
-  */
-} as CalendarOptions;
+const calendarOptions = computed(
+  () =>
+    ({
+      plugins: [
+        dayGridPlugin,
+        timeGridPlugin,
+        interactionPlugin, // needed for dateClick
+      ],
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+      },
+      initialView: "dayGridMonth",
+      events: events.value,
+      editable: true,
+      selectable: true,
+      selectMirror: true,
+      dayMaxEvents: true,
+      weekends: true,
+      select: handleDateSelect,
+      eventClick: handleEventClick,
+      // eventsSet: handleEvents,
+    }) as CalendarOptions,
+);
 
 // function handleEventAdd({ event }: EventAddArg): void {
-//   console.log(JSON.stringify(event));
 //   if (event.start !== null && event.end !== null) {
 //     eventStore.addEvent({
 //       id: event.id,
@@ -120,13 +116,13 @@ function handleEventClick(clickInfo: EventClickArg) {
     clickInfo.event.remove();
   }
 }
-function handleEvents(events: EventApi[]) {
-  // currentEvents = events;
-  console.log("handle events", events);
-}
+// function handleEvents(events: EventApi[]) {
+//   // currentEvents = events;
+// }
 </script>
 <template>
   <div>
+    <pre>{{ JSON.stringify(events, null, 2) }}</pre>
     <p v-for="event in events" :key="event.id">{{ event.title }}</p>
     <FullCalendar class="demo-app-calendar" :options="calendarOptions">
       <template #eventContent="arg">

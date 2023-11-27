@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useEventStore } from "../store/event";
 import type { FormData } from "./FullCalendar.vue";
 const isFormPending = ref(false);
 const props = defineProps<{
@@ -7,9 +8,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: [];
 }>();
-const {
-  public: { API_URL },
-} = useRuntimeConfig();
+
+const eventStore = useEventStore();
 const form = reactive<FormData>({
   title: "",
   start: props.modelValue?.start ?? new Date(),
@@ -24,16 +24,8 @@ watch(props.modelValue, () => {
   form.allDay = props.modelValue.allDay;
 });
 function onSubmit() {
-  isFormPending.value = true;
-  fetch(`${API_URL}/events`, {
-    method: "POST",
-    body: JSON.stringify(form),
-  })
-    .then((res) => res.json())
-    .then(() => {
-      isFormPending.value = false;
-      emit("close");
-    });
+  eventStore.addEvent({ ...form, createdAt: new Date() });
+  emit("close");
 }
 </script>
 <template>
