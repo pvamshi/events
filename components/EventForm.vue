@@ -16,6 +16,8 @@ const form = reactive<FormData>({
   end: props.modelValue?.end ?? new Date(),
   allDay: props.modelValue?.allDay ?? false,
   description: "",
+  guests: [],
+  location: "",
 });
 
 watch(props.modelValue, () => {
@@ -60,6 +62,13 @@ function onSubmit() {
     </el-form-item>
     <el-form-item label="All Day">
       <el-switch v-model="form.allDay" />
+    </el-form-item>
+
+    <el-form-item label="Location">
+      <el-input v-model="form.location" />
+    </el-form-item>
+    <el-form-item label="Guests">
+      <GuestsForm v-model="form.guests" />
     </el-form-item>
     <el-form-item label="Description">
       <el-input v-model="form.description" type="textarea" />

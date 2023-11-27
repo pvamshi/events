@@ -19,6 +19,8 @@ export interface FormData {
   allDay: boolean;
   title: string;
   description: string;
+  guests: string[];
+  location: string;
 }
 const formData: FormData = reactive({
   start: new Date(),
@@ -26,6 +28,8 @@ const formData: FormData = reactive({
   allDay: false,
   title: "",
   description: "",
+  guests: [],
+  location: "",
 });
 const {
   public: { API_URL },
@@ -36,6 +40,7 @@ const { events } = storeToRefs(eventStore);
 if (events.value === null) {
   eventStore.fetchEvents(API_URL);
 }
+
 const calendarOptions = computed(
   () =>
     ({

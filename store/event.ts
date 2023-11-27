@@ -9,6 +9,8 @@ export interface Event {
   end: Date;
   allDay: boolean;
   createdAt: Date;
+  guests: string[];
+  location: string;
 }
 
 interface EventAPIModel {
@@ -19,17 +21,31 @@ interface EventAPIModel {
   end: string;
   allDay: boolean;
   createdAt: string;
+  guests: string[];
+  location: string;
 }
 
+interface Guest {
+  id: string;
+  name: string;
+  email: string;
+  rsvp: "Yes" | "No" | "Maybe";
+}
 export const useEventStore = defineStore("event", {
   state: (): {
     _events: Event[] | null;
     API_URL: string | null;
+    guests: Guest[] | null;
     loadingAddEvent: boolean;
+    addGuestInProgress: boolean;
+    guestsMap: Record<string, Guest>;
   } => ({
     _events: null,
     API_URL: null,
     loadingAddEvent: false,
+    guests: null,
+    guestsMap: {},
+    addGuestInProgress: false,
   }),
   getters: {
     events: (state) => state._events,
@@ -60,52 +76,36 @@ export const useEventStore = defineStore("event", {
           end: event.end.getTime(),
           allDay: event.allDay,
           createdAt: new Date().getTime(),
+          guests: event.guests,
+          location: event.location,
         }),
       }).then((res) => res.json());
       this._events?.push(response);
       this.loadingAddEvent = false;
     },
+    async fetchGuests() {
+      this.guests = await fetch(`${this.API_URL}/guests`).then((res) =>
+        res.json(),
+      );
+      this.guestsMap = (this.guests || []).reduce<Record<string, Guest>>(
+        (acc, guest) => {
+          acc[guest.id] = guest;
+          return acc;
+        },
+        {},
+      );
+    },
+    async addGuest(guest: Omit<Guest, "id" | "rsvp">) {
+      this.addGuestInProgress = true;
+      const response = await fetch(`${this.API_URL}/guests`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(guest),
+      }).then((res) => res.json());
+      this.guests?.push(response);
+      this.addGuestInProgress = false;
+    },
   },
 });
-
-// export const useEventStore2 = defineStore("event", () => {
-//   const {
-//     public: { API_URL },
-//   } = useRuntimeConfig();
-//   const _store = reactive<{ events: Event[] | null }>({
-//     events: null,
-//   });
-//   const addEvent = (event: Event) => {
-//     _store.events?.push(event);
-//   };
-//   const removeEvent = (id: string) => {
-//     _store.events = (_store.events || []).filter((e) => e.id !== id);
-//   };
-//   const updateEvent = (event: Event) => {
-//     if (_store.events) {
-//       const matchingEvent = _store.events.findIndex((e) => e.id === event.id);
-//       if (matchingEvent > -1) {
-//         _store.events[matchingEvent] = event;
-//       }
-//     }
-//   };
-//   const getEvents = () => {
-//     if (_store.events === null) {
-//       _fetchEvents();
-//     }
-//     return _store.events;
-//   };
-//   const _fetchEvents = () => {
-//     return fetch(`${API_URL}/events`)
-//       .then((res) => res.json())
-//       .then((events: Event[]) => {
-//         _store.events = events;
-//       });
-//   };
-//   return {
-//     addEvent,
-//     removeEvent,
-//     updateEvent,
-//     getEvents,
-//   };
-// });
