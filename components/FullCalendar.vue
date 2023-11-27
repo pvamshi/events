@@ -27,9 +27,15 @@ const formData: FormData = reactive({
   title: "",
   description: "",
 });
+const {
+  public: { API_URL },
+} = useRuntimeConfig();
 
 const eventStore = useEventStore();
-const currentEvents = eventStore.events;
+const { events } = storeToRefs(eventStore);
+if (events.value === null) {
+  eventStore.fetchEvents(API_URL);
+}
 const calendarOptions = {
   plugins: [
     dayGridPlugin,
@@ -42,7 +48,7 @@ const calendarOptions = {
     right: "dayGridMonth,timeGridWeek,timeGridDay",
   },
   initialView: "dayGridMonth",
-  events: currentEvents, // alternatively, use the `events` setting to fetch from a feed
+  events: [], // alternatively, use the `events` setting to fetch from a feed
   editable: true,
   selectable: true,
   selectMirror: true,
@@ -121,7 +127,7 @@ function handleEvents(events: EventApi[]) {
 </script>
 <template>
   <div>
-    {{ JSON.stringify(formData, null, 2) }}
+    <p v-for="event in events" :key="event.id">{{ event.title }}</p>
     <FullCalendar class="demo-app-calendar" :options="calendarOptions">
       <template #eventContent="arg">
         <b>{{ arg.timeText }}</b>
