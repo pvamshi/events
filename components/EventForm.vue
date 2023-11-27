@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useEventStore } from "../store/event";
 import type { FormData } from "./FullCalendar.vue";
-const isFormPending = ref(false);
 const props = defineProps<{
   modelValue: FormData;
 }>();
@@ -10,6 +9,7 @@ const emit = defineEmits<{
 }>();
 
 const eventStore = useEventStore();
+const { loadingAddEvent } = storeToRefs(eventStore);
 const form = reactive<FormData>({
   title: "",
   start: props.modelValue?.start ?? new Date(),
@@ -24,12 +24,13 @@ watch(props.modelValue, () => {
   form.allDay = props.modelValue.allDay;
 });
 function onSubmit() {
-  eventStore.addEvent({ ...form, createdAt: new Date() });
-  emit("close");
+  eventStore.addEvent({ ...form, createdAt: new Date() }).then(() => {
+    emit("close");
+  });
 }
 </script>
 <template>
-  <el-form :model="form" label-width="120px">
+  <el-form :model="form" label-width="120px" :disabled="loadingAddEvent">
     <el-form-item label="Title">
       <el-input v-model="form.title" />
     </el-form-item>
@@ -63,9 +64,10 @@ function onSubmit() {
     <el-form-item label="Description">
       <el-input v-model="form.description" type="textarea" />
     </el-form-item>
-    <p v-if="isFormPending">In progress</p>
-    <el-form-item v-else>
-      <el-button type="primary" @click="onSubmit">Create</el-button>
+    <el-form-item>
+      <el-button type="primary" @click="onSubmit">{{
+        loadingAddEvent ? "Adding Event... " : "Add Event"
+      }}</el-button>
       <el-button @click="emit('close')">Cancel</el-button>
     </el-form-item>
   </el-form>

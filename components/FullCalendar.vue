@@ -119,19 +119,34 @@ function handleEventClick(clickInfo: EventClickArg) {
 // function handleEvents(events: EventApi[]) {
 //   // currentEvents = events;
 // }
+
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent,
+  );
+}
 </script>
 <template>
   <div>
-    <pre>{{ JSON.stringify(events, null, 2) }}</pre>
-    <p v-for="event in events" :key="event.id">{{ event.title }}</p>
-    <FullCalendar class="demo-app-calendar" :options="calendarOptions">
+    <FullCalendar class="full-calendar" :options="calendarOptions">
       <template #eventContent="arg">
         <b>{{ arg.timeText }}</b>
         <i>{{ arg.event.title }}</i>
       </template>
     </FullCalendar>
-    <el-dialog v-model="dialogVisible" title="Add Event" width="50%">
+    <el-dialog
+      v-model="dialogVisible"
+      title="Add Event"
+      width="50%"
+      :fullscreen="isMobile()"
+    >
       <EventForm v-model="formData" @close="dialogVisible = false" />
     </el-dialog>
   </div>
 </template>
+<style>
+.full-calendar {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+</style>

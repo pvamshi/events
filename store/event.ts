@@ -25,9 +25,11 @@ export const useEventStore = defineStore("event", {
   state: (): {
     _events: Event[] | null;
     API_URL: string | null;
+    loadingAddEvent: boolean;
   } => ({
     _events: null,
     API_URL: null,
+    loadingAddEvent: false,
   }),
   getters: {
     events: (state) => state._events,
@@ -45,6 +47,7 @@ export const useEventStore = defineStore("event", {
       }));
     },
     async addEvent(event: Omit<Event, "id">) {
+      this.loadingAddEvent = true;
       const response = await fetch(`${this.API_URL}/events`, {
         method: "POST",
         headers: {
@@ -60,6 +63,7 @@ export const useEventStore = defineStore("event", {
         }),
       }).then((res) => res.json());
       this._events?.push(response);
+      this.loadingAddEvent = false;
     },
   },
 });
