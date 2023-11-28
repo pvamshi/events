@@ -11,6 +11,14 @@ if (Object.keys(guestsMap).length === 0) {
 const event = computed(
   () => (events.value || []).filter((e) => e.id === props.id)[0],
 );
+
+function editEvent() {
+  // TODO: implement edit event
+}
+
+function deleteEvent() {
+  // TODO: implement delete event
+}
 </script>
 <template>
   <p v-if="!event">Loading event ...</p>
