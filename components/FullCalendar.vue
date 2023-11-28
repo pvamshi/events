@@ -35,10 +35,15 @@ const {
   public: { API_URL },
 } = useRuntimeConfig();
 
+const modalContent = ref<"Add" | "View" | null>(null);
+const selectedEventId = ref<string | null>(null);
+const selectedEventTitle = ref<string>("Event details");
+
 const eventStore = useEventStore();
 const { events } = storeToRefs(eventStore);
 if (events.value === null) {
   eventStore.fetchEvents(API_URL);
+  eventStore.fetchGuests();
 }
 
 const calendarOptions = computed(
@@ -100,6 +105,7 @@ function handleDateSelect(selectInfo: DateSelectArg) {
   formData.end = selectInfo.end;
   formData.allDay = selectInfo.allDay;
   dialogVisible.value = true;
+  modalContent.value = "Add";
 
   // if (event.start !== null && event.end !== null) {
   //   eventStore.addEvent({
@@ -113,22 +119,27 @@ function handleDateSelect(selectInfo: DateSelectArg) {
   // }
 }
 function handleEventClick(clickInfo: EventClickArg) {
-  if (
-    confirm(
-      `Are you sure you want to delete the event '${clickInfo.event.title}'`,
-    )
-  ) {
-    clickInfo.event.remove();
-  }
+  dialogVisible.value = true;
+  modalContent.value = "View";
+  selectedEventId.value = clickInfo.event.id.toString();
+  selectedEventTitle.value = clickInfo.event.title;
+
+  // if (
+  //   confirm(
+  //     `Are you sure you want to delete the event '${clickInfo.event.title}'`,
+  //   )
+  // ) {
+  //   clickInfo.event.remove();
+  // }
 }
 // function handleEvents(events: EventApi[]) {
 //   // currentEvents = events;
 // }
-
-function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent,
-  );
+function closeModal() {
+  dialogVisible.value = false;
+  modalContent.value = null;
+  selectedEventId.value = null;
+  selectedEventTitle.value = "Event details";
 }
 </script>
 <template>
@@ -141,11 +152,15 @@ function isMobile() {
     </FullCalendar>
     <el-dialog
       v-model="dialogVisible"
-      title="Add Event"
-      width="50%"
-      :fullscreen="isMobile()"
+      :title="modalContent === 'Add' ? 'Add Event' : selectedEventTitle"
+      width="40%"
     >
-      <EventForm v-model="formData" @close="dialogVisible = false" />
+      <EventForm
+        v-if="modalContent === 'Add'"
+        v-model="formData"
+        @close="closeModal"
+      />
+      <ViewEvent v-else :id="selectedEventId" />
     </el-dialog>
   </div>
 </template>
