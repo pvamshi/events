@@ -8,7 +8,7 @@ export interface Event {
   end: Date;
   allDay: boolean;
   createdAt: Date;
-  guests: string[];
+  guests: Map<string, "Yes" | "May be" | "No">;
   location: string;
 }
 
@@ -22,6 +22,15 @@ interface EventAPIModel {
   createdAt: string;
   guests: Map<string, "Yes" | "May be" | "No">;
   location: string;
+}
+
+function toEventStore(event: EventAPIModel): Event {
+  return {
+    ...event,
+    start: new Date(event.start),
+    end: new Date(event.end),
+    createdAt: new Date(event.createdAt),
+  };
 }
 
 export const useEventStore = defineStore("event", {
@@ -44,14 +53,9 @@ export const useEventStore = defineStore("event", {
       const eventsResponse = await fetch(`${API_URL}/events`).then((res) =>
         res.json(),
       );
-      this._events = eventsResponse.map((e: EventAPIModel) => ({
-        ...e,
-        start: new Date(e.start),
-        end: new Date(e.end),
-        createdAt: new Date(e.createdAt),
-      }));
+      this._events = eventsResponse.map(toEventStore);
     },
-    async addEvent(event: Omit<Event, "id">) {
+    async addEvent(event: Omit<Event, "id" | "guests"> & { guests: string[] }) {
       this._addEventInProgress = true;
       const response = await fetch(`${this.API_URL}/events`, {
         method: "POST",
@@ -75,7 +79,7 @@ export const useEventStore = defineStore("event", {
           location: event.location,
         }),
       }).then((res) => res.json());
-      this._events?.push(response);
+      this._events?.push(toEventStore(response));
       this._addEventInProgress = false;
     },
   },

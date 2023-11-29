@@ -44,6 +44,7 @@ export const useGuestStore = defineStore("guest", {
         body: JSON.stringify(guest),
       }).then((res) => res.json());
       this._guests?.push(response);
+      this._guestsMap[response.id] = response;
       this._addGuestInProgress = false;
     },
   },

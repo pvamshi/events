@@ -8,6 +8,7 @@ const eventStore = useEventStore();
 const guestStore = useGuestStore();
 const { events } = storeToRefs(eventStore);
 const { guestsMap } = storeToRefs(guestStore);
+console.log(guestsMap);
 const event = computed(
   () => (events.value || []).filter((e) => e.id === props.id)[0],
 );
