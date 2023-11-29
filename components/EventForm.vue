@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEventStore } from "../store/event";
-import type { FormData } from "./FullCalendar.vue";
+import type { FormData } from "../app.vue";
 const props = defineProps<{
   modelValue: FormData;
 }>();

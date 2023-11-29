@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useEventStore } from "../store/event";
+import { useGuestStore } from "../store/guest";
 
 const showGuestForm = ref(false);
-const eventStore = useEventStore();
-const { guests, addGuestInProgress } = storeToRefs(eventStore);
+const guestStore = useGuestStore();
+const { guests, addGuestInProgress } = storeToRefs(guestStore);
 const props = defineProps<{
   modelValue: string[];
 }>();
@@ -19,7 +19,7 @@ const value = computed({
 });
 
 if (guests.value === null) {
-  eventStore.fetchGuests();
+  guestStore.fetchGuests();
 }
 const form = reactive({
   name: "",
@@ -27,7 +27,7 @@ const form = reactive({
 });
 
 function addGuest() {
-  eventStore.addGuest(form).then(() => {
+  guestStore.addGuest(form).then(() => {
     form.name = "";
     form.email = "";
     showGuestForm.value = false;
@@ -92,5 +92,10 @@ function addGuest() {
 .guest-form {
   margin-top: 20px;
   width: 280px;
+  margin-left: -60px;
+}
+
+.guest-form .el-input {
+  margin-top: 10px;
 }
 </style>

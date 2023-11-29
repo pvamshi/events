@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useEventStore } from "../store/event";
+import { useGuestStore } from "../store/guest";
 const props = defineProps<{
   id: string;
 }>();
 const eventStore = useEventStore();
-const { events, guestsMap } = storeToRefs(eventStore);
+const guestStore = useGuestStore();
+const { events } = storeToRefs(eventStore);
+const { guestsMap } = storeToRefs(guestStore);
 if (Object.keys(guestsMap).length === 0) {
   eventStore.fetchGuests();
 }

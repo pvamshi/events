@@ -1,4 +1,3 @@
-// stores/counter.js
 import { defineStore } from "pinia";
 
 export interface Event {
@@ -21,49 +20,39 @@ interface EventAPIModel {
   end: string;
   allDay: boolean;
   createdAt: string;
-  guests: string[];
+  guests: Map<string, "Yes" | "May be" | "No">;
   location: string;
 }
 
-interface Guest {
-  id: string;
-  name: string;
-  email: string;
-  rsvp: "Yes" | "No" | "Maybe";
-}
+const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
+
 export const useEventStore = defineStore("event", {
   state: (): {
     _events: Event[] | null;
     API_URL: string | null;
-    guests: Guest[] | null;
-    loadingAddEvent: boolean;
-    addGuestInProgress: boolean;
-    guestsMap: Record<string, Guest>;
+    _addEventInProgress: boolean;
   } => ({
     _events: null,
     API_URL: null,
-    loadingAddEvent: false,
-    guests: null,
-    guestsMap: {},
-    addGuestInProgress: false,
+    _addEventInProgress: false,
   }),
   getters: {
     events: (state) => state._events,
+    addEventInProgress: (state) => state._addEventInProgress,
   },
   actions: {
     async fetchEvents(API_URL: string) {
       this.API_URL = API_URL;
-      this._events = (
-        await fetch(`${API_URL}/events`).then((res) => res.json())
-      ).map((e: EventAPIModel) => ({
+      const rs = await fetch(`${API_URL}/events`).then((res) => res.json());
+      this._events = rs.map((e: EventAPIModel) => ({
         ...e,
-        start: new Date(e.start).toISOString().replace(/T.*$/, ""),
-        end: new Date(e.end).toISOString().replace(/T.*$/, ""),
-        createdAt: new Date(e.createdAt).toISOString().replace(/T.*$/, ""),
+        start: new Date(e.start - tzoffset).toISOString(),
+        end: new Date(e.end - tzoffset).toISOString(),
+        createdAt: new Date(e.createdAt - tzoffset).toISOString(),
       }));
     },
     async addEvent(event: Omit<Event, "id">) {
-      this.loadingAddEvent = true;
+      this._addEventInProgress = true;
       const response = await fetch(`${this.API_URL}/events`, {
         method: "POST",
         headers: {
@@ -76,36 +65,18 @@ export const useEventStore = defineStore("event", {
           end: event.end.getTime(),
           allDay: event.allDay,
           createdAt: new Date().getTime(),
-          guests: event.guests,
+          guests: event.guests.reduce<Record<string, "Yes" | "May be" | "No">>(
+            (acc, guest) => {
+              acc[guest] = "May be";
+              return acc;
+            },
+            {},
+          ),
           location: event.location,
         }),
       }).then((res) => res.json());
       this._events?.push(response);
-      this.loadingAddEvent = false;
-    },
-    async fetchGuests() {
-      this.guests = await fetch(`${this.API_URL}/guests`).then((res) =>
-        res.json(),
-      );
-      this.guestsMap = (this.guests || []).reduce<Record<string, Guest>>(
-        (acc, guest) => {
-          acc[guest.id] = guest;
-          return acc;
-        },
-        {},
-      );
-    },
-    async addGuest(guest: Omit<Guest, "id" | "rsvp">) {
-      this.addGuestInProgress = true;
-      const response = await fetch(`${this.API_URL}/guests`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(guest),
-      }).then((res) => res.json());
-      this.guests?.push(response);
-      this.addGuestInProgress = false;
+      this._addEventInProgress = false;
     },
   },
 });

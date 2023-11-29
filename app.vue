@@ -2,10 +2,11 @@
 import "element-plus/dist/index.css";
 
 import { useEventStore } from "./store/event";
+import { useGuestStore } from "./store/guest";
 
 const dialogVisible = ref(false);
 
-interface FormData {
+export interface FormData {
   start: Date;
   end: Date;
   allDay: boolean;
@@ -33,11 +34,12 @@ const {
 } = useRuntimeConfig();
 
 const eventStore = useEventStore();
+const guestStore = useGuestStore();
 const { events } = storeToRefs(eventStore);
 
 if (events.value === null) {
   eventStore.fetchEvents(API_URL);
-  eventStore.fetchGuests();
+  guestStore.fetchGuests(API_URL);
 }
 
 function closeModal() {
