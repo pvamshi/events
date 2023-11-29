@@ -24,8 +24,6 @@ interface EventAPIModel {
   location: string;
 }
 
-const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
-
 export const useEventStore = defineStore("event", {
   state: (): {
     _events: Event[] | null;
@@ -43,12 +41,14 @@ export const useEventStore = defineStore("event", {
   actions: {
     async fetchEvents(API_URL: string) {
       this.API_URL = API_URL;
-      const rs = await fetch(`${API_URL}/events`).then((res) => res.json());
-      this._events = rs.map((e: EventAPIModel) => ({
+      const eventsResponse = await fetch(`${API_URL}/events`).then((res) =>
+        res.json(),
+      );
+      this._events = eventsResponse.map((e: EventAPIModel) => ({
         ...e,
-        start: new Date(e.start - tzoffset).toISOString(),
-        end: new Date(e.end - tzoffset).toISOString(),
-        createdAt: new Date(e.createdAt - tzoffset).toISOString(),
+        start: new Date(e.start),
+        end: new Date(e.end),
+        createdAt: new Date(e.createdAt),
       }));
     },
     async addEvent(event: Omit<Event, "id">) {
