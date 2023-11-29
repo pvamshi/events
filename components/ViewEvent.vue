@@ -8,9 +8,6 @@ const eventStore = useEventStore();
 const guestStore = useGuestStore();
 const { events } = storeToRefs(eventStore);
 const { guestsMap } = storeToRefs(guestStore);
-if (Object.keys(guestsMap).length === 0) {
-  eventStore.fetchGuests();
-}
 const event = computed(
   () => (events.value || []).filter((e) => e.id === props.id)[0],
 );

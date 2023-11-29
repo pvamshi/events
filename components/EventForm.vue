@@ -9,7 +9,7 @@ const emit = defineEmits<{
 }>();
 
 const eventStore = useEventStore();
-const { loadingAddEvent } = storeToRefs(eventStore);
+const { addEventInProgress } = storeToRefs(eventStore);
 const form = reactive<FormData>({
   title: "",
   start: props.modelValue?.start ?? new Date(),
@@ -36,7 +36,7 @@ function onSubmit() {
 }
 </script>
 <template>
-  <el-form :model="form" label-width="120px" :disabled="loadingAddEvent">
+  <el-form :model="form" label-width="120px" :disabled="addEventInProgress">
     <el-form-item label="Title">
       <el-input v-model="form.title" />
     </el-form-item>
@@ -79,18 +79,9 @@ function onSubmit() {
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="onSubmit">{{
-        loadingAddEvent ? "Adding Event... " : "Add Event"
+        addEventInProgress ? "Adding Event... " : "Add Event"
       }}</el-button>
       <el-button @click="emit('close')">Cancel</el-button>
     </el-form-item>
   </el-form>
-
-  <!-- <template #footer> -->
-  <!--   <span class="dialog-footer"> -->
-  <!--     <el-button @click="dialogVisible = false">Cancel</el-button> -->
-  <!--     <el-button type="primary" @click="dialogVisible = false"> -->
-  <!--       Confirm -->
-  <!--     </el-button> -->
-  <!--   </span> -->
-  <!-- </template> -->
 </template>

@@ -15,6 +15,8 @@ export interface FormData {
   guests: string[];
   location: string;
 }
+
+// Component data
 const formData: FormData = reactive({
   start: new Date(),
   end: new Date(),
@@ -29,6 +31,7 @@ const modalContent = ref<"Add" | "View" | null>(null);
 const selectedEventId = ref<string | null>(null);
 const selectedEventTitle = ref<string>("Event details");
 
+// store data
 const {
   public: { API_URL },
 } = useRuntimeConfig();
@@ -37,11 +40,13 @@ const eventStore = useEventStore();
 const guestStore = useGuestStore();
 const { events } = storeToRefs(eventStore);
 
+// Initatialize store data
 if (events.value === null) {
   eventStore.fetchEvents(API_URL);
   guestStore.fetchGuests(API_URL);
 }
 
+// component methods
 function closeModal() {
   dialogVisible.value = false;
   modalContent.value = null;

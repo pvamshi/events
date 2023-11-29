@@ -4,6 +4,7 @@ import { useGuestStore } from "../store/guest";
 const showGuestForm = ref(false);
 const guestStore = useGuestStore();
 const { guests, addGuestInProgress } = storeToRefs(guestStore);
+
 const props = defineProps<{
   modelValue: string[];
 }>();
@@ -18,9 +19,6 @@ const value = computed({
   },
 });
 
-if (guests.value === null) {
-  guestStore.fetchGuests();
-}
 const form = reactive({
   name: "",
   email: "",
