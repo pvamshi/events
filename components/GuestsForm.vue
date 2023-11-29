@@ -70,7 +70,7 @@ function addGuest() {
       <el-form-item label="Email">
         <el-input v-model="form.email" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="guest-form-buttons">
         <el-button type="primary" @click="addGuest">{{
           addGuestInProgress ? "Creating guest .." : "Create"
         }}</el-button>
@@ -97,5 +97,10 @@ function addGuest() {
 
 .guest-form .el-input {
   margin-top: 10px;
+}
+
+.guest-form-buttons {
+  margin-top: 10px;
+  margin-left: 60px;
 }
 </style>

@@ -1,8 +1,13 @@
-# Nuxt 3 Minimal Starter
-
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
 ## Setup
+
+1. Clone the repository
+2. Install dependencies
+
+```sh
+pnpm install
+```
+
+It is suggested to use `pnpm` but `npm`,`yarn` or `bun` can also be used ( but not tested yet)
 
 Make sure to install the dependencies:
 

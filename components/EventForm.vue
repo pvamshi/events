@@ -27,6 +27,10 @@ watch(props.modelValue, () => {
 });
 function onSubmit() {
   eventStore.addEvent({ ...form, createdAt: new Date() }).then(() => {
+    ElMessage({
+      message: "All invitations have been sent!",
+      type: "success",
+    });
     emit("close");
   });
 }
