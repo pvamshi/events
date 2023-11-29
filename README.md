@@ -22,5 +22,6 @@ Note: The `.env` file is also included in the source. Ideally in real project it
 3. Fix the UX for add guests
 4. Error handling
 5. Validations
-6. Bug: Clicking on event when `allDay` is `false` gives an exception. A bug from the library  
+6. Bug: Clicking on event when `allDay` is `false` gives an exception. A bug from the library
+7. Implement `Edit` and `Delete` functionality for events
 
