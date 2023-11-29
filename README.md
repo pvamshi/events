@@ -6,75 +6,23 @@
 ```sh
 pnpm install
 ```
-
-It is suggested to use `pnpm` but `npm`,`yarn` or `bun` can also be used ( but not tested yet)
-
-Make sure to install the dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
+## Run 
+```sh
 pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
+Run the dev command and check the app in the browser with the given URL
 
-## Production
+Note: The `.env` file is also included in the source. Ideally in real project it should be coming from from CI/CD application
 
-Build the application for production:
 
-```bash
-# npm
-npm run build
+## Features yet to add or bugs
 
-# pnpm
-pnpm run build
+1. Testing
+  a. Fix the testing infrastructure
+  b. Write tests
+2. Make the modals responsive
+3. Fix the UX for add guests
+4. Error handling
+5. Validations
+6. Bug: Clicking on event when `allDay` is `false` gives an exception. A bug from the library  
 
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
