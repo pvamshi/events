@@ -17,9 +17,7 @@ Note: The `.env` file is also included in the source. Ideally in real project it
 
 ## Features yet to add or bugs
 
-1. Testing
-  a. Fix the testing infrastructure
-  b. Write tests
+1. Fix the testing infrastructure and write tests
 2. Make the modals responsive
 3. Fix the UX for add guests
 4. Error handling
